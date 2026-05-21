@@ -39,7 +39,7 @@ const SymInfo* symLookupGlobal(const std::string& n);
 bool symExistsCurrentScope(const std::string& n);
 void symInsert(std::string n, std::string t, int ln, std::string sc = "");
 
-// --- IR generation helpers ---
+// --- IR Generation helpers ---
 std::string newTmp();
 std::string newLbl();
 void emit(std::string s);
@@ -51,11 +51,11 @@ bool typeCompatible(const std::string& lhs, const std::string& rhs);
 void semanticWarn(const std::string& msg);
 void semanticError(const std::string& msg);
 
-// --- Printing / Debug ---
+// --- Printing ---
 void printAST(Node* n, int d = 0);
 void printSymTable();
 
-// --- Optimization / Codegen ---
+// --- Optimization & Codegen ---
 void optimize();
 void codegen();
 Node* optimizeAST(Node* n);

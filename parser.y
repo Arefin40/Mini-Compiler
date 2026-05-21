@@ -67,19 +67,14 @@ funcs
    ;
 
 type
-   : INT
-      { $$ = strdup("int"); }
-   | CHAR
-      { $$ = strdup("char"); }
-   | STRING
-      { $$ = strdup("string"); }
+   : INT             { $$ = strdup("int"); }
+   | CHAR            { $$ = strdup("char"); }
+   | STRING          { $$ = strdup("string"); }
    ;
 
 params
-   : paramlist
-      { $$ = $1; }
-   | /* empty */
-      { $$ = make("PARAMS"); }
+   : paramlist       { $$ = $1; }
+   | /* empty */     { $$ = make("PARAMS"); }
    ;
 
 paramlist
@@ -88,8 +83,9 @@ paramlist
          $$ = make("PARAMS");
          Node* p = make("PARAM", $2);
          addChild($$, p);
-               if (symExistsCurrentScope($2)) semanticWarn(string("redeclaration of parameter: ") + $2);
-               symInsert($2, $1, yylineno);
+         if (symExistsCurrentScope($2))
+            semanticWarn(string("redeclaration of parameter: ") + $2);
+         symInsert($2, $1, yylineno);
       }
    | paramlist ',' type ID
       {
@@ -105,16 +101,13 @@ block
    : '{' stmts '}'
       {
          $$ = make("BODY");
-         for (auto c : $2->children)
-               addChild($$, c);
+         for (auto c : $2->children) addChild($$, c);
       }
    ;
 
 stmts
-   : stmts stmt
-      { addChild($1, $2); $$ = $1; }
-   | /* empty */
-      { $$ = make("STMTS"); }
+   : stmts stmt   { addChild($1, $2); $$ = $1; }
+   | /* empty */  { $$ = make("STMTS"); }
    ;
 
 stmt
@@ -184,57 +177,63 @@ expr
       { $$ = make("GT"); addChild($$, $1); addChild($$, $3); }
    | ID '(' args ')' {
       const SymInfo* fn = symLookupGlobal($1);
-      if (!fn) semanticError(string("call to undeclared function: ") + $1);
-      else if (fn->type.find("func(") != 0) semanticError(string("identifier is not a function: ") + $1);
+      
+      if (!fn)
+         semanticError(string("call to undeclared function: ") + $1);
+      else if (fn->type.find("func(") != 0)
+         semanticError(string("identifier is not a function: ") + $1);
+
       $$ = make("CALL", $1);
-      for (auto c : $3->children)
-            addChild($$, c);
+      for (auto c : $3->children) addChild($$, c);
    }
    | ID {
       if (!symLookup($1)) semanticError(string("use of undeclared variable: ") + $1);
       $$ = make("ID", $1);
    }
-   | NUM             { $$ = make("NUM", string($1)); }
-   | CHARLIT         { $$ = make("CHAR", string($1)); }
-   | STR             { $$ = make("STR", string($1)); }
-   | '(' expr ')'    { $$ = $2; }
+   | NUM                { $$ = make("NUM", string($1)); }
+   | CHARLIT            { $$ = make("CHAR", string($1)); }
+   | STR                { $$ = make("STR", string($1)); }
+   | '(' expr ')'       { $$ = $2; }
    ;
 
 args
-   : arglist
-      { $$ = $1; }
-   | /* empty */
-      { $$ = make("ARGS"); }
+   : arglist            { $$ = $1; }
+   | /* empty */        { $$ = make("ARGS"); }
    ;
 
 arglist
-   : expr
-      { $$ = make("ARGS"); addChild($$, $1); }
-   | arglist ',' expr
-      { addChild($1, $3); $$ = $1; }
+   : expr               { $$ = make("ARGS"); addChild($$, $1); }
+   | arglist ',' expr   { addChild($1, $3); $$ = $1; }
    ;
 
 %%
 
 int main()
 {
-   printf("\n1. Lexical Analysis\n----------------------------------------\n");
+   printf("\n1. Lexical Analysis");
+   printf("\n----------------------------------------\n");
    printf("Line  Type            Token\n");
    printf("----------------------------------------\n");
 
    yyparse();
 
-   printf("\n2. Syntax Analysis\n----------------------------------------\n");
+   printf("\n2. Syntax Analysis");
+   printf("\n----------------------------------------\n");
    if (!parseError) printf("Success | 0 errors\n"); else printf("Failure | %d errors\n", parseErrors);
 
-   printf("\nSemantic Analysis\n----------------------------------------\n");
+   printf("\nSemantic Analysis");
+   printf("\n----------------------------------------\n");
    printf("Errors: %d | Warnings: %d\n", semanticErrors, semanticWarnings);
-   if (semanticLogs.empty()) printf("No semantic issues.\n");
-   else for (auto &l : semanticLogs) printf("%s\n", l.c_str());
+   if (semanticLogs.empty())
+      printf("No semantic issues.\n");
+   else
+      for (auto &l : semanticLogs)
+         printf("%s\n", l.c_str());
 
    printSymTable();
 
-   printf("\n4. Syntax Tree\n----------------------------------------\n");
+   printf("\n4. Syntax Tree");
+   printf("\n----------------------------------------\n");
    printAST(root);
 
    optimizeLogs.clear();
@@ -242,14 +241,22 @@ int main()
 
    ir.clear();
    genIR(root);
-   printf("\n5. IR (Three Address Code)\n----------------------------------------\n");
-   for (auto &s : ir) printf("%s\n", s.c_str());
+   printf("\n5. IR (Three Address Code)");
+   printf("\n----------------------------------------\n");
+   for (auto &s : ir)
+      printf("%s\n", s.c_str());
 
    optimize();
-   printf("\n6. Code Optimization & Dead Code removal\n----------------------------------------\n");
-   if (optimizeLogs.empty()) printf("No optimization logs.\n"); else for (auto &l : optimizeLogs) printf("%s\n", l.c_str());
+   printf("\n6. Code Optimization & Dead Code removal");
+   printf("\n----------------------------------------\n");
+   if (optimizeLogs.empty())
+      printf("No optimization logs.\n");
+   else
+      for (auto &l : optimizeLogs)
+         printf("%s\n", l.c_str());
 
-   printf("\n7. Assembly Code\n----------------------------------------\n");
+   printf("\n7. Assembly Code");
+   printf("\n----------------------------------------\n");
    codegen();
 
    return 0;
