@@ -53,12 +53,13 @@ funcs
    ;
 
    func
-   : type ID '(' params ')' block
+   : type ID
+      { currentFunction = string($2); }
+     '(' params ')' block
       {
-         currentFunction = string($2);
          $$ = make("FUNC", $2);
-         addChild($$, $4);
-         addChild($$, $6);
+         addChild($$, $5);
+         addChild($$, $7);
          if (symLookupGlobal($2)) semanticWarn(string("redeclaration of function: ") + $2);
          symInsert($2, string("func(") + $1 + ")", yylineno, "global");
          currentFunction = "global";
