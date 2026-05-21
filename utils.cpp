@@ -8,6 +8,7 @@
 #include <sstream>
 #include <cctype>
 #include <algorithm>
+#include <format>
 
 using namespace std;
 
@@ -418,30 +419,30 @@ Node* optimizeAST(Node* n)
       {
          if (right && right->type == "NUM" && right->value == "0")
          {
-            optimizeLogs.push_back("Removed redundant operation: x + 0 -> x");
+            optimizeLogs.push_back("Removed redundant operation: " + left->value + " + 0 -> " + left->value);
             return left;
          }
          if (left && left->type == "NUM" && left->value == "0")
          {
-            optimizeLogs.push_back("Removed redundant operation: 0 + x -> x");
+            optimizeLogs.push_back("Removed redundant operation: " + right->value + " + 0 -> " + right->value);
             return right;
          }
       }
       if (n->type == "SUB" && right && right->type == "NUM" && right->value == "0")
       {
-         optimizeLogs.push_back("Removed redundant operation: x - 0 -> x");
+         optimizeLogs.push_back("Removed redundant operation: " + left->value + " - 0 -> " + left->value);
          return left;
       }
       if (n->type == "MUL")
       {
          if ((right && right->type == "NUM" && right->value == "1") || (left && left->type == "NUM" && left->value == "1"))
          {
-            optimizeLogs.push_back("Removed redundant operation: x * 1 -> x");
+            optimizeLogs.push_back("Removed redundant operation: " + left->value + " * 1 -> " + left->value);
             return right && right->type == "NUM" && right->value == "1" ? left : right;
          }
          if ((right && right->type == "NUM" && right->value == "0") || (left && left->type == "NUM" && left->value == "0"))
          {
-            optimizeLogs.push_back("Removed redundant operation: x * 0 -> 0");
+            optimizeLogs.push_back("Removed redundant operation: " + left->value + " * 0 -> 0");
             return make("NUM", "0");
          }
       }
@@ -449,12 +450,13 @@ Node* optimizeAST(Node* n)
       {
          if (right && right->type == "NUM" && right->value == "1")
          {
-            optimizeLogs.push_back("Removed redundant operation: x / 1 -> x");
+            optimizeLogs.push_back("Removed redundant operation: " + left->value + " / 1 -> " + left->value);
+
             return left;
          }
          if (left && left->type == "NUM" && left->value == "0")
          {
-            optimizeLogs.push_back("Removed redundant operation: 0 / x -> 0");
+            optimizeLogs.push_back("Removed redundant operation: 0 / " + right->value + " -> 0");
             return make("NUM", "0");
          }
       }
