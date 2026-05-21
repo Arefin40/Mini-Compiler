@@ -1,0 +1,48 @@
+/* =========================
+   Compiler Optimization Test
+   ========================= */
+
+int add(int x, int y) {
+    int result;
+    result = x + y;      // simple expression
+    return result;
+}
+
+int main() {
+
+    int x;
+    int y;
+
+    x = 3;               // constant assignment
+    y = 10;              // constant assignment
+
+    // constant expression (foldable)
+    int z;
+    z = (2 * 5) + (10 - 3);   // => 10 + 7 => 17
+
+    /* dead code example:
+       this block is never true after optimization if folded properly */
+    if (0) {
+        x = x + 100;     // unreachable code
+    } else {
+        x = add(x, y);   // function call
+    }
+
+    // if-else with condition simplification opportunity
+    if (x > 0) {
+        x = x - 0;       // redundant operation
+    } else {
+        x = x + 0;       // redundant operation
+    }
+
+    // while loop with predictable decrement
+    while (x > 0) {
+        x = x - 1;       // loop reduction opportunity
+    }
+
+    // dead variable usage candidate
+    int unused;
+    unused = 5;          // should be removed if optimized
+
+    return z;            // constant return candidate
+}
