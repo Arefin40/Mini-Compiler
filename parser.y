@@ -52,7 +52,7 @@ funcs
       { $$ = make("PROGRAM"); addChild($$, $1); }
    ;
 
-   func
+func
    : type ID
       { currentFunction = string($2); }
      '(' params ')' block
@@ -221,7 +221,13 @@ int main()
    printf("\n----------------------------------------\n");
    if (!parseError) printf("Success | 0 errors\n"); else printf("Failure | %d errors\n", parseErrors);
 
-   printf("\nSemantic Analysis");
+   printSymTable();
+
+   printf("\nSyntax Tree:");
+   printf("\n----------------------------------------\n");
+   printAST(root);
+
+   printf("\n3. Semantic Analysis");
    printf("\n----------------------------------------\n");
    printf("Errors: %d | Warnings: %d\n", semanticErrors, semanticWarnings);
    if (semanticLogs.empty())
@@ -230,24 +236,18 @@ int main()
       for (auto &l : semanticLogs)
          printf("%s\n", l.c_str());
 
-   printSymTable();
-
-   printf("\n4. Syntax Tree");
-   printf("\n----------------------------------------\n");
-   printAST(root);
-
    optimizeLogs.clear();
    root = optimizeAST(root);
 
    ir.clear();
    genIR(root);
-   printf("\n5. IR (Three Address Code)");
+   printf("\n4. IR (Three Address Code)");
    printf("\n----------------------------------------\n");
    for (auto &s : ir)
       printf("%s\n", s.c_str());
 
    optimize();
-   printf("\n6. Code Optimization & Dead Code removal");
+   printf("\n5. Code Optimization & Dead Code removal");
    printf("\n----------------------------------------\n");
    if (optimizeLogs.empty())
       printf("No optimization logs.\n");
@@ -255,7 +255,7 @@ int main()
       for (auto &l : optimizeLogs)
          printf("%s\n", l.c_str());
 
-   printf("\n7. Assembly Code");
+   printf("\n6. Assembly Code");
    printf("\n----------------------------------------\n");
    codegen();
 

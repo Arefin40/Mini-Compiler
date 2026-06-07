@@ -115,7 +115,7 @@ void printAST(Node* n, int d)
 
 void printSymTable()
 {
-   printf("\n3. Symbol table");
+   printf("\nSymbol table:");
    printf("\n----------------------------------------\n");
    printf("%-15s %-12s %-6s %-12s\n", "Name", "Type", "Line", "Scope");
    printf("\n----------------------------------------\n");
